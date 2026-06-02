@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>背單字卡片</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1>背單字卡片</h1>
+        <p>點擊卡片翻頁，管理頁面可新增、編輯、刪除單字。</p>
+      </div>
+      <nav class="tabs">
+        <button id="tab-study" class="tab-button active" type="button">學習</button>
+        <button id="tab-manage" class="tab-button" type="button">管理</button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="study-view" class="page active">
+        <div class="card-frame">
+          <div class="card" id="vocab-card" tabindex="0" aria-label="單字卡片，點擊翻轉">
+            <div class="face front">
+              <div class="face-title">英文單字</div>
+              <div id="card-word" class="word-text">Loading...</div>
+            </div>
+            <div class="face back">
+              <div class="face-title">單字資訊</div>
+              <dl class="word-info">
+                <div>
+                  <dt>翻譯</dt>
+                  <dd id="card-translation">-</dd>
+                </div>
+                <div>
+                  <dt>詞性</dt>
+                  <dd id="card-pos">-</dd>
+                </div>
+                <div>
+                  <dt>例句</dt>
+                  <dd id="card-example">-</dd>
+                </div>
+                <div>
+                  <dt>字根分析</dt>
+                  <dd id="card-root">-</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <div class="study-actions">
+          <button id="prev-word" type="button">上一個</button>
+          <button id="next-word" type="button">下一個</button>
+        </div>
+      </section>
+
+      <section id="manage-view" class="page">
+        <form id="manage-form" class="manage-form">
+          <div class="form-row">
+            <label for="word-input">英文單字</label>
+            <input id="word-input" name="word" type="text" placeholder="請輸入英文單字" required />
+          </div>
+          <div class="form-row">
+            <label for="translation-input">翻譯</label>
+            <input id="translation-input" name="translation" type="text" placeholder="例如：蘋果" />
+          </div>
+          <div class="form-row">
+            <label for="pos-input">詞性</label>
+            <input id="pos-input" name="partOfSpeech" type="text" placeholder="例如：名詞" />
+          </div>
+          <div class="form-row">
+            <label for="example-input">例句</label>
+            <textarea id="example-input" name="example" rows="3" placeholder="例如：I eat an apple every day."></textarea>
+          </div>
+          <div class="form-row">
+            <label for="root-input">字根分析</label>
+            <textarea id="root-input" name="root" rows="3" placeholder="例如：ap- 表示..."></textarea>
+          </div>
+
+          <div class="button-row">
+            <button id="auto-fill" type="button">自動填入</button>
+            <button id="save-word" type="submit">儲存單字</button>
+            <button id="reset-form" type="button">清除欄位</button>
+          </div>
+        </form>
+
+        <p id="status-message" class="status-message" aria-live="polite"></p>
+
+        <div class="word-list-card">
+          <h2>我的單字清單</h2>
+          <div id="word-list-items" class="word-list-items"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
