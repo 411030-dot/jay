@@ -84,6 +84,55 @@ const defaultWords = [
     example: 'The new puzzle was a difficult challenge.',
     root: 'challen- 來自拉丁語 calumnia，原指批評或責難。',
   },
+  {
+    word: 'wonderful',
+    translation: '美妙的',
+    partOfSpeech: '形容詞',
+    example: 'The view from the top of the hill was wonderful.',
+    root: 'wonder + ful，表示令人驚奇的。',
+  },
+  {
+    word: 'responsible',
+    translation: '負責任的',
+    partOfSpeech: '形容詞',
+    example: 'She is responsible for feeding the dog every morning.',
+    root: 're- 再次，spons- 承諾 → 負責。',
+  },
+  {
+    word: 'solution',
+    translation: '解決方案',
+    partOfSpeech: '名詞',
+    example: 'They finally found a solution to the math problem.',
+    root: 'solu- 來自拉丁語 solvere，表示解開或溶解。',
+  },
+  {
+    word: 'healthy',
+    translation: '健康的',
+    partOfSpeech: '形容詞',
+    example: 'Eating fruits and vegetables is good for a healthy life.',
+    root: 'health + y，表示健康的狀態。',
+  },
+  {
+    word: 'imagine',
+    translation: '想像',
+    partOfSpeech: '動詞',
+    example: 'Can you imagine life on another planet?',
+    root: 'im- 使..., agin- 來自拉丁語 agere，表示做或驅動。',
+  },
+  {
+    word: 'adventure',
+    translation: '冒險',
+    partOfSpeech: '名詞',
+    example: 'They went on an amazing adventure in the forest.',
+    root: 'ad- 向前，venture- 冒險、嘗試。',
+  },
+  {
+    word: 'confident',
+    translation: '有自信的',
+    partOfSpeech: '形容詞',
+    example: 'He felt confident before the presentation.',
+    root: 'con- 一起，fid- 信任 → 自信。',
+  },
 ];
 
 const elements = {
