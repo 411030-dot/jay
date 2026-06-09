@@ -56,6 +56,34 @@ const defaultWords = [
     example: 'They wear helmets to protect their heads.',
     root: 'pro- 向前，tect- 遮蔽 → 保護。',
   },
+  {
+    word: 'journey',
+    translation: '旅程',
+    partOfSpeech: '名詞',
+    example: 'The journey through the mountains took three days.',
+    root: 'jour- 來自法語 jour，表示一天，延伸為旅程。',
+  },
+  {
+    word: 'creative',
+    translation: '有創造力的',
+    partOfSpeech: '形容詞',
+    example: 'He is very creative when designing posters.',
+    root: 'create- 來自拉丁語 creare，表示創造。',
+  },
+  {
+    word: 'improve',
+    translation: '改善',
+    partOfSpeech: '動詞',
+    example: 'She wants to improve her English skills.',
+    root: 'im- 使...，prove- 證明 → 使更好。',
+  },
+  {
+    word: 'challenge',
+    translation: '挑戰',
+    partOfSpeech: '名詞/動詞',
+    example: 'The new puzzle was a difficult challenge.',
+    root: 'challen- 來自拉丁語 calumnia，原指批評或責難。',
+  },
 ];
 
 const elements = {
