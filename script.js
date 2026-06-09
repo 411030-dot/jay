@@ -1,4 +1,6 @@
 const STORAGE_KEY = 'vocabCards';
+const BACKEND_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYED_ID/exec'; // Replace with your deployed Apps Script web app URL
+
 const defaultWords = [
   {
     word: 'apple',
@@ -185,6 +187,23 @@ function saveCards() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(vocabCards));
 }
 
+async function postWordToBackend(wordData) {
+  const response = await fetch(BACKEND_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(wordData),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || '後端回傳錯誤');
+  }
+
+  return response.json();
+}
+
 function renderCard() {
   if (vocabCards.length === 0) {
     elements.cardWord.textContent = '尚無單字';
@@ -369,7 +388,7 @@ async function autoFillFields() {
   }
 }
 
-function saveForm(event) {
+async function saveForm(event) {
   event.preventDefault();
   const word = elements.wordInput.value.trim();
   if (!word) {
@@ -387,7 +406,7 @@ function saveForm(event) {
 
   if (editingIndex >= 0 && editingIndex < vocabCards.length) {
     vocabCards[editingIndex] = item;
-    showMessage(`已更新「${word}」。`);
+    showMessage(`正在更新「${word}」，並同步到後端...`);
   } else {
     const exists = vocabCards.some((entry) => entry.word.toLowerCase() === word.toLowerCase());
     if (exists) {
@@ -396,12 +415,21 @@ function saveForm(event) {
     }
     vocabCards.push(item);
     currentIndex = vocabCards.length - 1;
-    showMessage(`已新增「${word}」。`);
+    showMessage(`正在新增「${word}」，並同步到後端...`);
   }
 
   saveCards();
   renderWordList();
   renderCard();
+
+  try {
+    await postWordToBackend(item);
+    showMessage(`已儲存「${word}」並送到後端。`);
+  } catch (error) {
+    console.error(error);
+    showMessage(`已儲存單字，但後端同步失敗：${error.message}`, true);
+  }
+
   resetForm();
 }
 
