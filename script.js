@@ -21,6 +21,41 @@ const defaultWords = [
     example: 'The machine uses a lot of energy.',
     root: 'en- 表示使..., erg- 表示工作。',
   },
+  {
+    word: 'brave',
+    translation: '勇敢的',
+    partOfSpeech: '形容詞',
+    example: 'The brave firefighter saved the child.',
+    root: '來源於古英語 bræ̂w，表示勇氣和無畏。',
+  },
+  {
+    word: 'curious',
+    translation: '好奇的',
+    partOfSpeech: '形容詞',
+    example: 'The curious cat watched the bird through the window.',
+    root: 'curi- 來自拉丁語 curiosus，表示關心和探索。',
+  },
+  {
+    word: 'history',
+    translation: '歷史',
+    partOfSpeech: '名詞',
+    example: 'We studied the history of ancient civilizations.',
+    root: 'his- 來自拉丁語 historia，表示故事或記載。',
+  },
+  {
+    word: 'practice',
+    translation: '練習',
+    partOfSpeech: '名詞/動詞',
+    example: 'She practices the piano every evening.',
+    root: 'practice 來自拉丁語 practicare，表示執行或實踐。',
+  },
+  {
+    word: 'protect',
+    translation: '保護',
+    partOfSpeech: '動詞',
+    example: 'They wear helmets to protect their heads.',
+    root: 'pro- 向前，tect- 遮蔽 → 保護。',
+  },
 ];
 
 const elements = {
