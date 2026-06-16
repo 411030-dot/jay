@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'vocabCards';
-const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbx_m890y3VDYp5eijcxXGM0lfOR_j7fpGoZdqoOaDfMGiQDioH41RjWfNxAeRNDJBt2/exec'; // Replace with your deployed Apps Script web app URL
+const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwAU1R6SLTXmnLS4J4fudIOBxzfvapBIXf0yozaKHkcgU8DCtlSopCT6VHcuf_-477j/exec'; // Replace with your deployed Apps Script web app URL
 
 const defaultWords = [
   {

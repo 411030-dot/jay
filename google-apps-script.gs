@@ -1,4 +1,4 @@
-const SPREADSHEET_ID = '1SMNYHOjrph6cuHYCAJxKrXisn4pv9RPcWep2WcYt_rg';
+const SPREADSHEET_ID = '1USp6KiM63cHbwPlOx2-A56YQO3furqY9ZWYQZs1wh3M';
 const SHEET_NAME = 'Words';
 const SHEET_HEADERS = ['英文單字', '中文翻譯', '字根分析', '例句', '詞性', '建立時間'];
 
@@ -52,9 +52,6 @@ function getWordSheet() {
 function createJsonResponse(payload, statusCode) {
   const output = ContentService.createTextOutput(JSON.stringify(payload));
   output.setMimeType(ContentService.MimeType.JSON);
-  output.setHeader('Access-Control-Allow-Origin', '*');
-  output.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  output.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (statusCode) {
     output.setResponseCode(statusCode);
   }
