@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'vocabCards';
-const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwAU1R6SLTXmnLS4J4fudIOBxzfvapBIXf0yozaKHkcgU8DCtlSopCT6VHcuf_-477j/exec'; // Replace with your deployed Apps Script web app URL
+const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbz5UmFR26j-nQud_gEbysKV3PrMvZj4Pdk81kNxlfCwrxI3kJN3LxHeE_E0fm_qy8pp0Q/exec'; // 部署 GAS 後填入你的 Web App URL
 
 const defaultWords = [
   {

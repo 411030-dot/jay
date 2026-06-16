@@ -1,4 +1,4 @@
-const SPREADSHEET_ID = '1USp6KiM63cHbwPlOx2-A56YQO3furqY9ZWYQZs1wh3M';
+const SPREADSHEET_ID = '1zLPrp0ELLwBdc8Dpj4PLX6Y7mZwbTcaLHbPQT4mIqvk';
 const SHEET_NAME = 'Words';
 const SHEET_HEADERS = ['英文單字', '中文翻譯', '字根分析', '例句', '詞性', '建立時間'];
 
