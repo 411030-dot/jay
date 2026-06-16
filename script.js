@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'vocabCards';
-const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxO2LCNx74GZWJmmxlfFR2tsap-guAjjL13pQkSt1jWtbo8Z0yU68LV0JgSKDOCEVvZug/exec'; // 部署 GAS 後填入你的 Web App URL
+const BACKEND_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYED_ID/exec'; // 請改成您部署後的 Web App URL
 
 const defaultWords = [
   {
@@ -22,118 +22,6 @@ const defaultWords = [
     partOfSpeech: '名詞',
     example: 'The machine uses a lot of energy.',
     root: 'en- 表示使..., erg- 表示工作。',
-  },
-  {
-    word: 'brave',
-    translation: '勇敢的',
-    partOfSpeech: '形容詞',
-    example: 'The brave firefighter saved the child.',
-    root: '來源於古英語 bræ̂w，表示勇氣和無畏。',
-  },
-  {
-    word: 'curious',
-    translation: '好奇的',
-    partOfSpeech: '形容詞',
-    example: 'The curious cat watched the bird through the window.',
-    root: 'curi- 來自拉丁語 curiosus，表示關心和探索。',
-  },
-  {
-    word: 'history',
-    translation: '歷史',
-    partOfSpeech: '名詞',
-    example: 'We studied the history of ancient civilizations.',
-    root: 'his- 來自拉丁語 historia，表示故事或記載。',
-  },
-  {
-    word: 'practice',
-    translation: '練習',
-    partOfSpeech: '名詞/動詞',
-    example: 'She practices the piano every evening.',
-    root: 'practice 來自拉丁語 practicare，表示執行或實踐。',
-  },
-  {
-    word: 'protect',
-    translation: '保護',
-    partOfSpeech: '動詞',
-    example: 'They wear helmets to protect their heads.',
-    root: 'pro- 向前，tect- 遮蔽 → 保護。',
-  },
-  {
-    word: 'journey',
-    translation: '旅程',
-    partOfSpeech: '名詞',
-    example: 'The journey through the mountains took three days.',
-    root: 'jour- 來自法語 jour，表示一天，延伸為旅程。',
-  },
-  {
-    word: 'creative',
-    translation: '有創造力的',
-    partOfSpeech: '形容詞',
-    example: 'He is very creative when designing posters.',
-    root: 'create- 來自拉丁語 creare，表示創造。',
-  },
-  {
-    word: 'improve',
-    translation: '改善',
-    partOfSpeech: '動詞',
-    example: 'She wants to improve her English skills.',
-    root: 'im- 使...，prove- 證明 → 使更好。',
-  },
-  {
-    word: 'challenge',
-    translation: '挑戰',
-    partOfSpeech: '名詞/動詞',
-    example: 'The new puzzle was a difficult challenge.',
-    root: 'challen- 來自拉丁語 calumnia，原指批評或責難。',
-  },
-  {
-    word: 'wonderful',
-    translation: '美妙的',
-    partOfSpeech: '形容詞',
-    example: 'The view from the top of the hill was wonderful.',
-    root: 'wonder + ful，表示令人驚奇的。',
-  },
-  {
-    word: 'responsible',
-    translation: '負責任的',
-    partOfSpeech: '形容詞',
-    example: 'She is responsible for feeding the dog every morning.',
-    root: 're- 再次，spons- 承諾 → 負責。',
-  },
-  {
-    word: 'solution',
-    translation: '解決方案',
-    partOfSpeech: '名詞',
-    example: 'They finally found a solution to the math problem.',
-    root: 'solu- 來自拉丁語 solvere，表示解開或溶解。',
-  },
-  {
-    word: 'healthy',
-    translation: '健康的',
-    partOfSpeech: '形容詞',
-    example: 'Eating fruits and vegetables is good for a healthy life.',
-    root: 'health + y，表示健康的狀態。',
-  },
-  {
-    word: 'imagine',
-    translation: '想像',
-    partOfSpeech: '動詞',
-    example: 'Can you imagine life on another planet?',
-    root: 'im- 使..., agin- 來自拉丁語 agere，表示做或驅動。',
-  },
-  {
-    word: 'adventure',
-    translation: '冒險',
-    partOfSpeech: '名詞',
-    example: 'They went on an amazing adventure in the forest.',
-    root: 'ad- 向前，venture- 冒險、嘗試。',
-  },
-  {
-    word: 'confident',
-    translation: '有自信的',
-    partOfSpeech: '形容詞',
-    example: 'He felt confident before the presentation.',
-    root: 'con- 一起，fid- 信任 → 自信。',
   },
 ];
 
@@ -306,8 +194,7 @@ function applyWordListEvents() {
 }
 
 async function fetchDictionaryData(word) {
-  const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`;
-  const response = await fetch(apiUrl);
+  const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
   if (!response.ok) {
     throw new Error('無法取得字典資料');
   }
@@ -315,8 +202,7 @@ async function fetchDictionaryData(word) {
 }
 
 async function fetchTranslation(word) {
-  const apiUrl = 'https://libretranslate.com/translate';
-  const response = await fetch(apiUrl, {
+  const response = await fetch('https://libretranslate.com/translate', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -336,14 +222,12 @@ async function fetchTranslation(word) {
 
 function extractRootInfo(entry) {
   if (!entry) return '';
-  if (entry.origin) {
-    return entry.origin;
-  }
+  if (entry.origin) return entry.origin;
   const word = entry.word || '';
   const suffixes = ['ing', 'ed', 'ly', 'tion', 'sion', 'able', 'ible'];
   const match = suffixes.find((suffix) => word.toLowerCase().endsWith(suffix));
   if (match) {
-    return `此單字可能包含後綴 ${match}。`; 
+    return `此單字可能包含後綴 ${match}。`;
   }
   return '暫無字根分析資料。';
 }
@@ -450,6 +334,7 @@ function setupEvents() {
   elements.autoFill.addEventListener('click', autoFillFields);
   elements.manageForm.addEventListener('submit', saveForm);
   elements.resetForm.addEventListener('click', resetForm);
+  applyWordListEvents();
 }
 
 function initialize() {

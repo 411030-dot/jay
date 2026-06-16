@@ -42,22 +42,40 @@ function doPost(e) {
 function getWordSheet() {
   const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = spreadsheet.getSheetByName(SHEET_NAME);
+
   if (!sheet) {
     sheet = spreadsheet.insertSheet(SHEET_NAME);
+  }
+
+  if (sheet.getLastRow() === 0) {
     sheet.appendRow(SHEET_HEADERS);
   }
+
   return sheet;
 }
 
-function createJsonResponse(payload, statusCode) {
+function createJsonResponse(payload, statusCode, headers) {
   const output = ContentService.createTextOutput(JSON.stringify(payload));
   output.setMimeType(ContentService.MimeType.JSON);
   if (statusCode) {
     output.setResponseCode(statusCode);
   }
+
+  if (headers) {
+    Object.keys(headers).forEach((key) => output.setHeader(key, headers[key]));
+  }
+
   return output;
 }
 
 function doOptions(e) {
-  return createJsonResponse({ success: true, message: '預檢請求已回應。' });
+  return createJsonResponse(
+    { success: true, message: '預檢請求已回應。' },
+    204,
+    {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    }
+  );
 }
