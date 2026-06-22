@@ -99,7 +99,8 @@ const elements = {
 function loadCollection() {
   const stored = localStorage.getItem(STORAGE_KEY);
   const items = stored ? JSON.parse(stored) : initialCollection;
-  return Array.isArray(items) ? items.map(sanitizeSet) : initialCollection;
+  const filtered = Array.isArray(items) ? items.filter((item) => item.theme !== "城市系列") : initialCollection;
+  return Array.isArray(filtered) ? filtered.map(sanitizeSet) : initialCollection;
 }
 
 function loadWishlist() {
@@ -159,12 +160,14 @@ function renderCollection() {
   const filterTheme = elements.themeFilter.value;
   const sortOption = elements.sortSelect.value;
 
-  let visibleItems = collection.filter((item) => {
-    const matchText = `${item.name} ${item.number}`.toLowerCase();
-    const matchesSearch = searchTerm ? matchText.includes(searchTerm) : true;
-    const matchesTheme = filterTheme === "all" ? true : item.theme === filterTheme;
-    return matchesSearch && matchesTheme;
-  });
+  let visibleItems = collection
+    .filter((item) => item.theme !== "城市系列")
+    .filter((item) => {
+      const matchText = `${item.name} ${item.number}`.toLowerCase();
+      const matchesSearch = searchTerm ? matchText.includes(searchTerm) : true;
+      const matchesTheme = filterTheme === "all" ? true : item.theme === filterTheme;
+      return matchesSearch && matchesTheme;
+    });
 
   visibleItems.sort((a, b) => {
     if (sortOption === "newest") return b.year - a.year;
