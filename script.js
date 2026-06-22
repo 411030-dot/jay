@@ -14,16 +14,6 @@ const initialCollection = [
   },
   {
     id: crypto.randomUUID(),
-    name: "城市消防站",
-    number: "60215",
-    theme: "城市系列",
-    year: 2020,
-    parts: 509,
-    image: "https://images.unsplash.com/photo-1558669023-094b4139f1da?auto=format&fit=crop&w=900&q=80",
-    notes: "實用城市街景",
-  },
-  {
-    id: crypto.randomUUID(),
     name: "披頭四時空旅行",
     number: "40428",
     theme: "其他",
