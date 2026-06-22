@@ -54,6 +54,7 @@
             <select id="themeFilter">
               <option value="all">全部系列</option>
               <option value="星際大戰">星際大戰</option>
+              <option value="城市系列">城市系列</option>
               <option value="科技系列">科技系列</option>
               <option value="漫威系列">漫威系列</option>
               <option value="哈利波特系列">哈利波特系列</option>
@@ -164,11 +165,13 @@
           <label>
             樂高編號
             <input type="text" id="setNumber" required />
+            <small class="input-note">圖片會自動依編號由 Brickset 生成，不需手動上傳。</small>
           </label>
           <label>
             系列
             <select id="setTheme" required>
               <option value="星際大戰">星際大戰</option>
+              <option value="城市系列">城市系列</option>
               <option value="科技系列">科技系列</option>
               <option value="漫威系列">漫威系列</option>
               <option value="哈利波特系列">哈利波特系列</option>
@@ -182,10 +185,6 @@
           <label>
             零件數
             <input type="number" id="setParts" min="1" required />
-          </label>
-          <label>
-            圖片上傳
-            <input type="file" id="setImage" accept="image/*" />
           </label>
           <label class="full-width">
             備註

@@ -657,6 +657,12 @@ footer {
   color: var(--text);
 }
 
+.input-note {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: -0.25rem;
+}
+
 .form-grid input,
 .form-grid select,
 .form-grid textarea {

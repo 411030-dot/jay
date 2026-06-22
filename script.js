@@ -1,5 +1,18 @@
 const STORAGE_KEY = "legoCollectorData";
 const wishlistKey = "legoWishlistData";
+const DEFAULT_IMAGE = "https://via.placeholder.com/300x200?text=LEGO";
+
+function getBricksetImageUrl(number) {
+  const trimmed = String(number).trim();
+  return trimmed ? `https://images.brickset.com/sets/images/${trimmed}-1.jpg` : DEFAULT_IMAGE;
+}
+
+function sanitizeSet(item) {
+  return {
+    ...item,
+    image: getBricksetImageUrl(item.number),
+  };
+}
 
 const initialCollection = [
   {
@@ -9,7 +22,7 @@ const initialCollection = [
     theme: "星際大戰",
     year: 2019,
     parts: 1352,
-    image: "https://images.unsplash.com/photo-1598887142485-9060d7023094?auto=format&fit=crop&w=900&q=80",
+    image: getBricksetImageUrl("75257"),
     notes: "最愛太空系列，收藏於2024年",
   },
   {
@@ -19,7 +32,7 @@ const initialCollection = [
     theme: "其他",
     year: 2024,
     parts: 423,
-    image: "https://images.unsplash.com/photo-1592891453394-8743bbaf004d?auto=format&fit=crop&w=900&q=80",
+    image: getBricksetImageUrl("40428"),
     notes: "特別版收藏",
   },
 ];
@@ -32,7 +45,7 @@ const initialWishlist = [
     price: "$2,299",
     priority: "高",
     purchased: false,
-    image: "https://images.unsplash.com/photo-1619336445157-18ce4f32a2f5?auto=format&fit=crop&w=900&q=80",
+    image: getBricksetImageUrl("76125"),
   },
   {
     id: crypto.randomUUID(),
@@ -41,7 +54,7 @@ const initialWishlist = [
     price: "$3,499",
     priority: "中",
     purchased: false,
-    image: "https://images.unsplash.com/photo-1582621856247-5e8171cb8d1b?auto=format&fit=crop&w=900&q=80",
+    image: getBricksetImageUrl("75954"),
   },
 ];
 
@@ -77,7 +90,6 @@ const elements = {
   setTheme: document.getElementById("setTheme"),
   setYear: document.getElementById("setYear"),
   setParts: document.getElementById("setParts"),
-  setImage: document.getElementById("setImage"),
   setNotes: document.getElementById("setNotes"),
   cancelBtn: document.getElementById("cancelBtn"),
   detailBody: document.getElementById("detailBody"),
@@ -86,12 +98,16 @@ const elements = {
 
 function loadCollection() {
   const stored = localStorage.getItem(STORAGE_KEY);
-  return stored ? JSON.parse(stored) : initialCollection;
+  const items = stored ? JSON.parse(stored) : initialCollection;
+  return Array.isArray(items) ? items.map(sanitizeSet) : initialCollection;
 }
 
 function loadWishlist() {
   const stored = localStorage.getItem(wishlistKey);
-  return stored ? JSON.parse(stored) : initialWishlist;
+  const items = stored ? JSON.parse(stored) : initialWishlist;
+  return Array.isArray(items)
+    ? items.map((item) => ({ ...item, image: getBricksetImageUrl(item.number) }))
+    : initialWishlist;
 }
 
 function saveState() {
@@ -161,7 +177,7 @@ function renderCollection() {
     .map(
       (item) => `
         <article class="set-card monitor-card">
-          <div class="card-image"><img src="${item.image}" alt="${item.name}" loading="lazy" /></div>
+          <div class="card-image"><img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.onerror=null;this.src='${DEFAULT_IMAGE}'" /></div>
           <div class="card-details">
             <div class="card-info">
               <div>
@@ -197,7 +213,7 @@ function renderWishlist() {
     .map(
       (item) => `
         <article class="wishlist-card monitor-card">
-          <div class="wishlist-image"><img src="${item.image}" alt="${item.name}" loading="lazy" /></div>
+          <div class="wishlist-image"><img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.onerror=null;this.src='${DEFAULT_IMAGE}'" /></div>
           <div class="wishlist-body">
             <div>
               <h4>${item.name}</h4>
@@ -344,7 +360,7 @@ function handleAction(event) {
 
   if (action === "view") {
     const detailHtml = `
-      <img src="${item.image}" alt="${item.name}" />
+      <img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.onerror=null;this.src='${DEFAULT_IMAGE}'" />
       <div class="detail-list">
         <div class="detail-row"><span class="detail-label">名稱</span><span class="detail-value">${item.name}</span></div>
         <div class="detail-row"><span class="detail-label">編號</span><span class="detail-value">${item.number}</span></div>
@@ -392,20 +408,10 @@ function handleFormSubmit(event) {
     image: "",
   };
 
-  if (elements.setImage.files.length) {
-    const file = elements.setImage.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      newData.image = reader.result;
-      commitSet(newData);
-    };
-    reader.readAsDataURL(file);
-  } else {
-    const existing = collection.find((item) => item.id === currentEditId);
-    newData.image = existing ? existing.image : "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=900&q=80";
-    commitSet(newData);
-  }
+  newData.image = getBricksetImageUrl(newData.number);
+  commitSet(newData);
 }
+
 
 function commitSet(data) {
   if (currentEditId) {
