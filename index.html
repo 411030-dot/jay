@@ -3,208 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="樂高收藏管理系統：純前端、響應式、現代簡約的收藏網站。管理你的收藏、願望清單與統計資料。" />
-  <title>樂高收藏管理系統</title>
+  <title>即時天氣查詢</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar">
-      <div class="branding">
-        <div class="brand-icon">L</div>
-        <div>
-          <h1>樂高收藏管理系統</h1>
-          <p>現代簡約收藏介面</p>
-        </div>
-      </div>
-      <nav class="topnav">
-        <a href="#home" class="active">首頁</a>
-        <a href="#collection">我的收藏</a>
-        <a href="#wishlist">願望清單</a>
-        <a href="#stats">統計資料</a>
-        <a href="#settings">設定</a>
-      </nav>
-      <div class="top-actions">
-        <button class="btn btn-outline" id="modeToggle">深色模式</button>
-        <button class="btn btn-primary" id="openAddModal">新增套組</button>
+    <header class="hero">
+      <div>
+        <p class="eyebrow">純前端天氣查詢</p>
+        <h1>輸入城市名稱，立即查詢天氣</h1>
+        <p>本專題示範 HTML、CSS、JavaScript 與 OpenWeather API 的串接。</p>
       </div>
     </header>
 
     <main>
-      <section class="hero" id="home">
-        <div class="hero-copy">
-          <p class="eyebrow">管理你的樂高世界</p>
-          <h2>在同一個地方查看、整理與分析所有收藏套組。</h2>
-          <p class="hero-desc">響應式設計適用於手機與桌機，搭配流暢互動與即時更新提示。</p>
+      <section class="search-panel">
+        <label for="cityInput">城市名稱</label>
+        <div class="search-box">
+          <input id="cityInput" type="text" placeholder="例如：Taipei, Tokyo, New York" />
+          <button id="searchButton">查詢</button>
         </div>
-        <div class="hero-state">
-          <div class="status-chip">最新資料已同步</div>
-          <div class="overview-grid" id="overviewCards"></div>
-        </div>
+        <p class="hint">請輸入城市名稱後按「查詢」或按 Enter。</p>
       </section>
 
-      <section class="control-panel">
-        <div class="control-row">
-          <div class="control-item search-field">
-            <label>搜尋樂高編號或名稱</label>
-            <input type="search" id="searchInput" placeholder="輸入編號或名稱" />
-          </div>
-          <div class="control-item">
-            <label>系列篩選</label>
-            <select id="themeFilter">
-              <option value="all">全部系列</option>
-              <option value="星際大戰">星際大戰</option>
-              <option value="科技系列">科技系列</option>
-              <option value="漫威系列">漫威系列</option>
-              <option value="哈利波特系列">哈利波特系列</option>
-              <option value="其他">其他</option>
-            </select>
-          </div>
-          <div class="control-item">
-            <label>排序方式</label>
-            <select id="sortSelect">
-              <option value="newest">最新上市</option>
-              <option value="oldest">最舊上市</option>
-              <option value="parts">零件數最多</option>
-              <option value="name">名稱排序</option>
-            </select>
-          </div>
-        </div>
-      </section>
-
-      <section class="collection-section" id="collection">
-        <div class="section-head">
+      <section class="weather-card hidden" id="weatherCard">
+        <div class="weather-header">
           <div>
-            <h3>我的收藏</h3>
-            <p>所有樂高套組一覽，隨時查看狀態與細節。</p>
+            <p class="weather-city" id="cityName"></p>
+            <p class="weather-desc" id="weatherDescription"></p>
           </div>
-          <span class="data-tip" id="updateHint">即時資料更新中</span>
+          <div class="weather-temp" id="temperature"></div>
         </div>
-        <div class="card-grid" id="collectionGrid"></div>
+
+        <div class="weather-details">
+          <div class="detail-item">
+            <span>濕度</span>
+            <strong id="humidity"></strong>
+          </div>
+          <div class="detail-item">
+            <span>風速</span>
+            <strong id="windSpeed"></strong>
+          </div>
+          <div class="detail-item">
+            <span>氣壓</span>
+            <strong id="pressure"></strong>
+          </div>
+          <div class="detail-item">
+            <span>天氣代碼</span>
+            <strong id="weatherCode"></strong>
+          </div>
+        </div>
       </section>
 
-      <section class="wishlist-section" id="wishlist">
-        <div class="section-head">
-          <div>
-            <h3>願望清單</h3>
-            <p>追蹤你想入手的樂高套組與購買優先順序。</p>
-          </div>
-        </div>
-        <div class="wishlist-grid" id="wishlistGrid"></div>
-      </section>
-
-      <section class="stats-section" id="stats">
-        <div class="section-head">
-          <div>
-            <h3>統計分析</h3>
-            <p>透過視覺化圖表了解收藏結構與成長趨勢。</p>
-          </div>
-        </div>
-        <div class="stats-grid">
-          <article class="stats-card">
-            <h4>系列收藏比例</h4>
-            <div class="chart-card">
-              <div class="pie-chart" id="themePie"></div>
-              <ul class="legend-list" id="pieLegend"></ul>
-            </div>
-          </article>
-          <article class="stats-card">
-            <h4>收藏年份分布</h4>
-            <div class="chart-card vertical-bars" id="yearBars"></div>
-          </article>
-          <article class="stats-card progress-card">
-            <h4>收藏進度</h4>
-            <div class="progress-list" id="progressList"></div>
-          </article>
-          <article class="stats-card progress-card">
-            <h4>願望清單完成率</h4>
-            <div class="status-block">
-              <p id="wishlistCompletion"></p>
-              <div class="progress-wrapper">
-                <div class="progress-track"><div class="progress-fill" id="wishlistProgress"></div></div>
-              </div>
-            </div>
-          </article>
-        </div>
-      </section>
+      <div class="message" id="message"></div>
     </main>
-
-    <footer id="settings">
-      <div class="footer-grid">
-        <div>
-          <h4>關於網站</h4>
-          <p>這是一個純前端的樂高收藏管理介面，強調簡潔、響應式與操作體驗。</p>
-        </div>
-        <div>
-          <h4>連絡方式</h4>
-          <p>contact@lego-collector.app</p>
-        </div>
-        <div class="footer-links">
-          <a href="#">使用條款</a>
-          <a href="#">隱私政策</a>
-        </div>
-      </div>
-    </footer>
-  </div>
-
-  <div class="toast hidden" id="toast"></div>
-
-  <div class="modal hidden" id="itemModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="modalTitle">新增樂高套組</h3>
-        <button class="icon-btn" id="closeModal">×</button>
-      </div>
-      <form id="itemForm">
-        <div class="form-grid">
-          <label>
-            套組名稱
-            <input type="text" id="setName" required />
-          </label>
-          <label>
-            樂高編號
-            <input type="text" id="setNumber" required />
-            <small class="input-note">圖片會自動依編號由 Brickset 生成，不需手動上傳。</small>
-          </label>
-          <label>
-            系列
-            <select id="setTheme" required>
-              <option value="星際大戰">星際大戰</option>
-              <option value="科技系列">科技系列</option>
-              <option value="漫威系列">漫威系列</option>
-              <option value="哈利波特系列">哈利波特系列</option>
-              <option value="其他">其他</option>
-            </select>
-          </label>
-          <label>
-            上市年份
-            <input type="number" id="setYear" min="1970" max="2035" required />
-          </label>
-          <label>
-            零件數
-            <input type="number" id="setParts" min="1" required />
-          </label>
-          <label class="full-width">
-            備註
-            <textarea id="setNotes" rows="3" placeholder="可填寫收藏日期、狀態或特別註記"></textarea>
-          </label>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-outline" id="cancelBtn">取消</button>
-          <button type="submit" class="btn btn-primary">儲存</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="modal hidden" id="detailModal">
-    <div class="modal-card detail-modal-card">
-      <div class="modal-header">
-        <h3>套組詳細資訊</h3>
-        <button class="icon-btn" id="closeDetail">×</button>
-      </div>
-      <div class="detail-body" id="detailBody"></div>
-    </div>
   </div>
 
   <script src="script.js"></script>
