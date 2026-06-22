@@ -322,6 +322,10 @@ textarea:focus {
 .data-tip {
   color: var(--primary);
   font-weight: 600;
+  display: inline-flex;
+  white-space: nowrap;
+  writing-mode: horizontal-tb;
+  text-orientation: mixed;
 }
 
 .card-grid {
