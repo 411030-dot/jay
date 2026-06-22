@@ -41,6 +41,7 @@ const initialWishlist = [
     number: "76125",
     price: "$2,299",
     priority: "高",
+    purchased: false,
     image: "https://images.unsplash.com/photo-1619336445157-18ce4f32a2f5?auto=format&fit=crop&w=900&q=80",
   },
   {
@@ -49,6 +50,7 @@ const initialWishlist = [
     number: "75954",
     price: "$3,499",
     priority: "中",
+    purchased: false,
     image: "https://images.unsplash.com/photo-1582621856247-5e8171cb8d1b?auto=format&fit=crop&w=900&q=80",
   },
 ];
@@ -214,7 +216,9 @@ function renderWishlist() {
             <div class="priority-pill">優先：${item.priority}</div>
             <span>預估價格：${item.price}</span>
           </div>
-          <button class="btn btn-primary" data-action="bought" data-id="${item.id}">標記已購買</button>
+          <button class="btn btn-primary" data-action="bought" data-id="${item.id}" ${item.purchased ? "disabled" : ""}>
+            ${item.purchased ? "已購買" : "標記已購買"}
+          </button>
         </article>
       `
     )
@@ -299,10 +303,10 @@ function renderStats() {
     </div>
   `;
 
-  const boughtCount = 0;
-  const wishlistRate = wishlist.length ? Math.round(((wishlist.length - boughtCount) / wishlist.length) * 100) : 0;
-  elements.wishlistCompletion.textContent = `完成率 ${100 - wishlistRate}%`;
-  elements.wishlistProgress.style.width = `${100 - wishlistRate}%`;
+  const boughtCount = wishlist.filter((item) => item.purchased).length;
+  const wishlistRate = wishlist.length ? Math.round((boughtCount / wishlist.length) * 100) : 100;
+  elements.wishlistCompletion.textContent = `完成率 ${wishlistRate}%`;
+  elements.wishlistProgress.style.width = `${wishlistRate}%`;
 }
 
 function resetForm() {
