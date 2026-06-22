@@ -3,98 +3,212 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>背單字卡片</title>
+  <title>樂高收藏管理系統</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="app-shell">
-    <header class="app-header">
-      <div>
-        <h1>背單字卡片</h1>
-        <p>點擊卡片翻頁，管理頁面可新增、編輯、刪除單字。</p>
+    <header class="topbar">
+      <div class="branding">
+        <div class="brand-icon">L</div>
+        <div>
+          <h1>樂高收藏管理系統</h1>
+          <p>現代簡約收藏介面</p>
+        </div>
       </div>
-      <nav class="tabs">
-        <button id="tab-study" class="tab-button active" type="button">學習</button>
-        <button id="tab-manage" class="tab-button" type="button">管理</button>
+      <nav class="topnav">
+        <a href="#home" class="active">首頁</a>
+        <a href="#collection">我的收藏</a>
+        <a href="#wishlist">願望清單</a>
+        <a href="#stats">統計資料</a>
+        <a href="#settings">設定</a>
       </nav>
+      <div class="top-actions">
+        <button class="btn btn-outline" id="modeToggle">深色模式</button>
+        <button class="btn btn-primary" id="openAddModal">新增套組</button>
+      </div>
     </header>
 
     <main>
-      <section id="study-view" class="page active">
-        <div class="card-frame">
-          <div class="card" id="vocab-card" tabindex="0" aria-label="單字卡片，點擊翻轉">
-            <div class="face front">
-              <div class="face-title">英文單字</div>
-              <div id="card-word" class="word-text">Loading...</div>
-            </div>
-            <div class="face back">
-              <div class="face-title">單字資訊</div>
-              <dl class="word-info">
-                <div>
-                  <dt>翻譯</dt>
-                  <dd id="card-translation">-</dd>
-                </div>
-                <div>
-                  <dt>詞性</dt>
-                  <dd id="card-pos">-</dd>
-                </div>
-                <div>
-                  <dt>例句</dt>
-                  <dd id="card-example">-</dd>
-                </div>
-                <div>
-                  <dt>字根分析</dt>
-                  <dd id="card-root">-</dd>
-                </div>
-              </dl>
-            </div>
-          </div>
+      <section class="hero" id="home">
+        <div class="hero-copy">
+          <p class="eyebrow">管理你的樂高世界</p>
+          <h2>在同一個地方查看、整理與分析所有收藏套組。</h2>
+          <p class="hero-desc">響應式設計適用於手機與桌機，搭配流暢互動與即時更新提示。</p>
         </div>
-
-        <div class="study-actions">
-          <button id="prev-word" type="button">上一個</button>
-          <button id="next-word" type="button">下一個</button>
+        <div class="hero-state">
+          <div class="status-chip">最新資料已同步</div>
+          <div class="overview-grid" id="overviewCards"></div>
         </div>
       </section>
 
-      <section id="manage-view" class="page">
-        <form id="manage-form" class="manage-form">
-          <div class="form-row">
-            <label for="word-input">英文單字</label>
-            <input id="word-input" name="word" type="text" placeholder="請輸入英文單字" required />
+      <section class="control-panel">
+        <div class="control-row">
+          <div class="control-item search-field">
+            <label>搜尋樂高編號或名稱</label>
+            <input type="search" id="searchInput" placeholder="輸入編號或名稱" />
           </div>
-          <div class="form-row">
-            <label for="translation-input">翻譯</label>
-            <input id="translation-input" name="translation" type="text" placeholder="例如：蘋果" />
+          <div class="control-item">
+            <label>系列篩選</label>
+            <select id="themeFilter">
+              <option value="all">全部系列</option>
+              <option value="星際大戰">星際大戰</option>
+              <option value="城市系列">城市系列</option>
+              <option value="科技系列">科技系列</option>
+              <option value="漫威系列">漫威系列</option>
+              <option value="哈利波特系列">哈利波特系列</option>
+              <option value="其他">其他</option>
+            </select>
           </div>
-          <div class="form-row">
-            <label for="pos-input">詞性</label>
-            <input id="pos-input" name="partOfSpeech" type="text" placeholder="例如：名詞" />
+          <div class="control-item">
+            <label>排序方式</label>
+            <select id="sortSelect">
+              <option value="newest">最新上市</option>
+              <option value="oldest">最舊上市</option>
+              <option value="parts">零件數最多</option>
+              <option value="name">名稱排序</option>
+            </select>
           </div>
-          <div class="form-row">
-            <label for="example-input">例句</label>
-            <textarea id="example-input" name="example" rows="3" placeholder="例如：I eat an apple every day."></textarea>
-          </div>
-          <div class="form-row">
-            <label for="root-input">字根分析</label>
-            <textarea id="root-input" name="root" rows="3" placeholder="例如：ap- 表示..."></textarea>
-          </div>
+        </div>
+      </section>
 
-          <div class="button-row">
-            <button id="auto-fill" type="button">自動填入</button>
-            <button id="save-word" type="submit">儲存單字</button>
-            <button id="reset-form" type="button">清除欄位</button>
+      <section class="collection-section" id="collection">
+        <div class="section-head">
+          <div>
+            <h3>我的收藏</h3>
+            <p>所有樂高套組一覽，隨時查看狀態與細節。</p>
           </div>
-        </form>
+          <span class="data-tip" id="updateHint">即時資料更新中</span>
+        </div>
+        <div class="card-grid" id="collectionGrid"></div>
+      </section>
 
-        <p id="status-message" class="status-message" aria-live="polite"></p>
+      <section class="wishlist-section" id="wishlist">
+        <div class="section-head">
+          <div>
+            <h3>願望清單</h3>
+            <p>追蹤你想入手的樂高套組與購買優先順序。</p>
+          </div>
+        </div>
+        <div class="wishlist-grid" id="wishlistGrid"></div>
+      </section>
 
-        <div class="word-list-card">
-          <h2>我的單字清單</h2>
-          <div id="word-list-items" class="word-list-items"></div>
+      <section class="stats-section" id="stats">
+        <div class="section-head">
+          <div>
+            <h3>統計分析</h3>
+            <p>透過視覺化圖表了解收藏結構與成長趨勢。</p>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <article class="stats-card">
+            <h4>系列收藏比例</h4>
+            <div class="chart-card">
+              <div class="pie-chart" id="themePie"></div>
+              <ul class="legend-list" id="pieLegend"></ul>
+            </div>
+          </article>
+          <article class="stats-card">
+            <h4>收藏年份分布</h4>
+            <div class="chart-card vertical-bars" id="yearBars"></div>
+          </article>
+          <article class="stats-card progress-card">
+            <h4>收藏進度</h4>
+            <div class="progress-list" id="progressList"></div>
+          </article>
+          <article class="stats-card progress-card">
+            <h4>願望清單完成率</h4>
+            <div class="status-block">
+              <p id="wishlistCompletion"></p>
+              <div class="progress-wrapper">
+                <div class="progress-track"><div class="progress-fill" id="wishlistProgress"></div></div>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
     </main>
+
+    <footer id="settings">
+      <div class="footer-grid">
+        <div>
+          <h4>關於網站</h4>
+          <p>這是一個純前端的樂高收藏管理介面，強調簡潔、響應式與操作體驗。</p>
+        </div>
+        <div>
+          <h4>連絡方式</h4>
+          <p>contact@lego-collector.app</p>
+        </div>
+        <div class="footer-links">
+          <a href="#">使用條款</a>
+          <a href="#">隱私政策</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <div class="modal hidden" id="itemModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">新增樂高套組</h3>
+        <button class="icon-btn" id="closeModal">×</button>
+      </div>
+      <form id="itemForm">
+        <div class="form-grid">
+          <label>
+            套組名稱
+            <input type="text" id="setName" required />
+          </label>
+          <label>
+            樂高編號
+            <input type="text" id="setNumber" required />
+          </label>
+          <label>
+            系列
+            <select id="setTheme" required>
+              <option value="星際大戰">星際大戰</option>
+              <option value="城市系列">城市系列</option>
+              <option value="科技系列">科技系列</option>
+              <option value="漫威系列">漫威系列</option>
+              <option value="哈利波特系列">哈利波特系列</option>
+              <option value="其他">其他</option>
+            </select>
+          </label>
+          <label>
+            上市年份
+            <input type="number" id="setYear" min="1970" max="2035" required />
+          </label>
+          <label>
+            零件數
+            <input type="number" id="setParts" min="1" required />
+          </label>
+          <label>
+            圖片上傳
+            <input type="file" id="setImage" accept="image/*" />
+          </label>
+          <label class="full-width">
+            備註
+            <textarea id="setNotes" rows="3" placeholder="可填寫收藏日期、狀態或特別註記"></textarea>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="cancelBtn">取消</button>
+          <button type="submit" class="btn btn-primary">儲存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="detailModal">
+    <div class="modal-card detail-modal-card">
+      <div class="modal-header">
+        <h3>套組詳細資訊</h3>
+        <button class="icon-btn" id="closeDetail">×</button>
+      </div>
+      <div class="detail-body" id="detailBody"></div>
+    </div>
   </div>
 
   <script src="script.js"></script>

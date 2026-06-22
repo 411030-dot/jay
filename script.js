@@ -1,347 +1,462 @@
-const STORAGE_KEY = 'vocabCards';
-const BACKEND_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYED_ID/exec'; // 請改成您部署後的 Web App URL
+const STORAGE_KEY = "legoCollectorData";
+const wishlistKey = "legoWishlistData";
 
-const defaultWords = [
+const initialCollection = [
   {
-    word: 'apple',
-    translation: '蘋果',
-    partOfSpeech: '名詞',
-    example: 'I eat an apple every day.',
-    root: 'apple：源自古英語 æppel，表示圓形果實。',
+    id: crypto.randomUUID(),
+    name: "千年鷹號",
+    number: "75257",
+    theme: "星際大戰",
+    year: 2019,
+    parts: 1352,
+    image: "https://images.unsplash.com/photo-1598887142485-9060d7023094?auto=format&fit=crop&w=900&q=80",
+    notes: "最愛太空系列，收藏於2024年",
   },
   {
-    word: 'discover',
-    translation: '發現',
-    partOfSpeech: '動詞',
-    example: 'She discovered a small cave behind the waterfall.',
-    root: 'dis- 表示否定，cover 覆蓋 → 露出、發現。',
+    id: crypto.randomUUID(),
+    name: "城市消防站",
+    number: "60215",
+    theme: "城市系列",
+    year: 2020,
+    parts: 509,
+    image: "https://images.unsplash.com/photo-1558669023-094b4139f1da?auto=format&fit=crop&w=900&q=80",
+    notes: "實用城市街景",
   },
   {
-    word: 'energy',
-    translation: '能量',
-    partOfSpeech: '名詞',
-    example: 'The machine uses a lot of energy.',
-    root: 'en- 表示使..., erg- 表示工作。',
+    id: crypto.randomUUID(),
+    name: "披頭四時空旅行",
+    number: "40428",
+    theme: "其他",
+    year: 2024,
+    parts: 423,
+    image: "https://images.unsplash.com/photo-1592891453394-8743bbaf004d?auto=format&fit=crop&w=900&q=80",
+    notes: "特別版收藏",
   },
 ];
 
+const initialWishlist = [
+  {
+    id: crypto.randomUUID(),
+    name: "鋼鐵人終極裝甲",
+    number: "76125",
+    price: "$2,299",
+    priority: "高",
+    image: "https://images.unsplash.com/photo-1619336445157-18ce4f32a2f5?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "哈利波特霍格華茲城堡",
+    number: "75954",
+    price: "$3,499",
+    priority: "中",
+    image: "https://images.unsplash.com/photo-1582621856247-5e8171cb8d1b?auto=format&fit=crop&w=900&q=80",
+  },
+];
+
+let collection = loadCollection();
+let wishlist = loadWishlist();
+let currentEditId = null;
+let stateUpdated = false;
+
 const elements = {
-  tabStudy: document.getElementById('tab-study'),
-  tabManage: document.getElementById('tab-manage'),
-  studyView: document.getElementById('study-view'),
-  manageView: document.getElementById('manage-view'),
-  vocabCard: document.getElementById('vocab-card'),
-  cardWord: document.getElementById('card-word'),
-  cardTranslation: document.getElementById('card-translation'),
-  cardPos: document.getElementById('card-pos'),
-  cardExample: document.getElementById('card-example'),
-  cardRoot: document.getElementById('card-root'),
-  prevWord: document.getElementById('prev-word'),
-  nextWord: document.getElementById('next-word'),
-  manageForm: document.getElementById('manage-form'),
-  wordInput: document.getElementById('word-input'),
-  translationInput: document.getElementById('translation-input'),
-  posInput: document.getElementById('pos-input'),
-  exampleInput: document.getElementById('example-input'),
-  rootInput: document.getElementById('root-input'),
-  autoFill: document.getElementById('auto-fill'),
-  resetForm: document.getElementById('reset-form'),
-  statusMessage: document.getElementById('status-message'),
-  wordListItems: document.getElementById('word-list-items'),
+  overviewCards: document.getElementById("overviewCards"),
+  collectionGrid: document.getElementById("collectionGrid"),
+  wishlistGrid: document.getElementById("wishlistGrid"),
+  themePie: document.getElementById("themePie"),
+  pieLegend: document.getElementById("pieLegend"),
+  yearBars: document.getElementById("yearBars"),
+  progressList: document.getElementById("progressList"),
+  wishlistCompletion: document.getElementById("wishlistCompletion"),
+  wishlistProgress: document.getElementById("wishlistProgress"),
+  updateHint: document.getElementById("updateHint"),
+  searchInput: document.getElementById("searchInput"),
+  themeFilter: document.getElementById("themeFilter"),
+  sortSelect: document.getElementById("sortSelect"),
+  modeToggle: document.getElementById("modeToggle"),
+  openAddModal: document.getElementById("openAddModal"),
+  itemModal: document.getElementById("itemModal"),
+  detailModal: document.getElementById("detailModal"),
+  closeModal: document.getElementById("closeModal"),
+  closeDetail: document.getElementById("closeDetail"),
+  itemForm: document.getElementById("itemForm"),
+  modalTitle: document.getElementById("modalTitle"),
+  setName: document.getElementById("setName"),
+  setNumber: document.getElementById("setNumber"),
+  setTheme: document.getElementById("setTheme"),
+  setYear: document.getElementById("setYear"),
+  setParts: document.getElementById("setParts"),
+  setImage: document.getElementById("setImage"),
+  setNotes: document.getElementById("setNotes"),
+  cancelBtn: document.getElementById("cancelBtn"),
+  detailBody: document.getElementById("detailBody"),
+  toast: document.getElementById("toast"),
 };
 
-let vocabCards = [];
-let currentIndex = 0;
-let editingIndex = -1;
-
-function loadCards() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        vocabCards = parsed;
-        return;
-      }
-    } catch (error) {
-      console.warn('無法解析儲存資料', error);
-    }
-  }
-  vocabCards = defaultWords;
-  saveCards();
+function loadCollection() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored ? JSON.parse(stored) : initialCollection;
 }
 
-function saveCards() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(vocabCards));
+function loadWishlist() {
+  const stored = localStorage.getItem(wishlistKey);
+  return stored ? JSON.parse(stored) : initialWishlist;
 }
 
-async function postWordToBackend(wordData) {
-  const response = await fetch(BACKEND_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(wordData),
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(collection));
+  localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+  stateUpdated = true;
+  showUpdateHint();
+}
+
+function showToast(message) {
+  elements.toast.textContent = message;
+  elements.toast.classList.add("show");
+  setTimeout(() => {
+    elements.toast.classList.remove("show");
+  }, 2400);
+}
+
+function showUpdateHint() {
+  elements.updateHint.textContent = "資料已更新 🔄";
+  elements.updateHint.style.opacity = "1";
+  setTimeout(() => {
+    elements.updateHint.style.opacity = "0.5";
+    elements.updateHint.textContent = "即時資料更新中";
+  }, 2200);
+}
+
+function renderOverview() {
+  const totalSets = collection.length;
+  const totalParts = collection.reduce((sum, item) => sum + Number(item.parts), 0);
+  const themes = new Set(collection.map((item) => item.theme));
+  const wishlistCount = wishlist.length;
+
+  const items = [
+    { title: "已收藏套組", value: totalSets, icon: "🧱" },
+    { title: "收藏總零件", value: totalParts, icon: "⚙️" },
+    { title: "收藏主題", value: themes.size, icon: "🎯" },
+    { title: "願望清單", value: wishlistCount, icon: "⭐" },
+  ];
+
+  elements.overviewCards.innerHTML = items
+    .map(
+      (item) => `<article class="overview-card"><div class="card-info"><h3>${item.title}</h3><p class="value">${item.value}</p></div><div class="meta"><span>${item.icon}</span><span>即時更新</span></div></article>`
+    )
+    .join("");
+}
+
+function renderCollection() {
+  const searchTerm = elements.searchInput.value.trim().toLowerCase();
+  const filterTheme = elements.themeFilter.value;
+  const sortOption = elements.sortSelect.value;
+
+  let visibleItems = collection.filter((item) => {
+    const matchText = `${item.name} ${item.number}`.toLowerCase();
+    const matchesSearch = searchTerm ? matchText.includes(searchTerm) : true;
+    const matchesTheme = filterTheme === "all" ? true : item.theme === filterTheme;
+    return matchesSearch && matchesTheme;
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || '後端回傳錯誤');
-  }
-
-  return response.json();
-}
-
-function renderCard() {
-  if (vocabCards.length === 0) {
-    elements.cardWord.textContent = '尚無單字';
-    elements.cardTranslation.textContent = '-';
-    elements.cardPos.textContent = '-';
-    elements.cardExample.textContent = '-';
-    elements.cardRoot.textContent = '-';
-    return;
-  }
-
-  const wordData = vocabCards[currentIndex];
-  elements.cardWord.textContent = wordData.word || '-';
-  elements.cardTranslation.textContent = wordData.translation || '暫無翻譯';
-  elements.cardPos.textContent = wordData.partOfSpeech || '暫無資料';
-  elements.cardExample.textContent = wordData.example || '暫無例句';
-  elements.cardRoot.textContent = wordData.root || '暫無分析';
-}
-
-function renderWordList() {
-  elements.wordListItems.innerHTML = '';
-  if (vocabCards.length === 0) {
-    elements.wordListItems.innerHTML = '<p>目前尚未新增任何單字。</p>';
-    return;
-  }
-
-  vocabCards.forEach((item, index) => {
-    const card = document.createElement('div');
-    card.className = 'word-card';
-    card.innerHTML = `
-      <strong>${item.word}</strong>
-      <small>翻譯：${item.translation || '無'} · 詞性：${item.partOfSpeech || '無'}</small>
-      <p>${item.example || '暫無例句'}</p>
-      <small>${item.root || '暫無字根分析'}</small>
-      <div class="card-actions">
-        <button type="button" data-action="edit" data-index="${index}">編輯</button>
-        <button type="button" data-action="delete" data-index="${index}">刪除</button>
-      </div>
-    `;
-    elements.wordListItems.appendChild(card);
+  visibleItems.sort((a, b) => {
+    if (sortOption === "newest") return b.year - a.year;
+    if (sortOption === "oldest") return a.year - b.year;
+    if (sortOption === "parts") return b.parts - a.parts;
+    return a.name.localeCompare(b.name, "zh-Hant");
   });
+
+  elements.collectionGrid.innerHTML = visibleItems
+    .map(
+      (item) => `
+        <article class="set-card monitor-card">
+          <div class="card-image"><img src="${item.image}" alt="${item.name}" loading="lazy" /></div>
+          <div class="card-details">
+            <div class="card-info">
+              <div>
+                <h4>${item.name}</h4>
+                <span>${item.theme}</span>
+              </div>
+              <span class="badge">收藏中</span>
+            </div>
+            <div class="card-meta">
+              <span>編號：${item.number}</span>
+              <span>年份：${item.year}</span>
+              <span>零件：${item.parts}</span>
+              <span>${item.notes || "無備註"}</span>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-outline btn-sm" data-action="view" data-id="${item.id}">查看詳細資訊</button>
+              <button class="btn btn-outline btn-sm" data-action="edit" data-id="${item.id}">編輯資料</button>
+              <button class="btn btn-outline btn-sm" data-action="delete" data-id="${item.id}">刪除收藏</button>
+            </div>
+          </div>
+        </article>
+      `
+    )
+    .join("");
+
+  if (!visibleItems.length) {
+    elements.collectionGrid.innerHTML = `<p class="muted">找不到符合條件的收藏套組，請嘗試調整搜尋或篩選。</p>`;
+  }
 }
 
-function showMessage(text, isError = false) {
-  elements.statusMessage.textContent = text;
-  elements.statusMessage.style.color = isError ? '#ffb4b4' : '#a3d9a5';
+function renderWishlist() {
+  elements.wishlistGrid.innerHTML = wishlist
+    .map(
+      (item) => `
+        <article class="wishlist-card monitor-card">
+          <div class="wishlist-image"><img src="${item.image}" alt="${item.name}" loading="lazy" /></div>
+          <div class="wishlist-body">
+            <div>
+              <h4>${item.name}</h4>
+              <span>編號：${item.number}</span>
+            </div>
+            <div class="priority-pill">優先：${item.priority}</div>
+            <span>預估價格：${item.price}</span>
+          </div>
+          <button class="btn btn-primary" data-action="bought" data-id="${item.id}">標記已購買</button>
+        </article>
+      `
+    )
+    .join("");
+
+  if (!wishlist.length) {
+    elements.wishlistGrid.innerHTML = `<p class="muted">願望清單目前為空。新增你想購買的樂高套組。</p>`;
+  }
 }
 
-function updateStudyIndex(delta) {
-  if (vocabCards.length === 0) return;
-  currentIndex = (currentIndex + delta + vocabCards.length) % vocabCards.length;
-  elements.vocabCard.classList.remove('flipped');
-  renderCard();
-}
+function renderStats() {
+  const themeCounts = collection.reduce((acc, item) => {
+    acc[item.theme] = (acc[item.theme] || 0) + 1;
+    return acc;
+  }, {});
 
-function switchTab(toManage) {
-  elements.studyView.classList.toggle('active', !toManage);
-  elements.manageView.classList.toggle('active', toManage);
-  elements.tabStudy.classList.toggle('active', !toManage);
-  elements.tabManage.classList.toggle('active', toManage);
+  const themeEntries = Object.entries(themeCounts);
+  const total = collection.length || 1;
+  const colors = ["#ef4444", "#f59e0b", "#f97316", "#facc15", "#fb7185", "#60a5fa"];
+
+  let start = 0;
+  const pieSegments = themeEntries.map(([theme, count], index) => {
+    const ratio = count / total;
+    const deg = ratio * 360;
+    const end = start + deg;
+    const color = colors[index % colors.length];
+    const segment = `${color} ${start}deg ${end}deg`;
+    start = end;
+    return { theme, ratio, color, segment };
+  });
+
+  elements.themePie.style.background = `conic-gradient(${pieSegments.map((part) => part.segment).join(", ")})`;
+  elements.pieLegend.innerHTML = pieSegments
+    .map(
+      (part) => `
+        <li><span class="legend-badge" style="background:${part.color}"></span>${part.theme}：${Math.round(part.ratio * 100)}%</li>
+      `
+    )
+    .join("");
+
+  const yearCounts = collection.reduce((acc, item) => {
+    acc[item.year] = (acc[item.year] || 0) + 1;
+    return acc;
+  }, {});
+
+  const sortedYears = Object.keys(yearCounts).sort((a, b) => a - b);
+  const maxYearCount = Math.max(...Object.values(yearCounts), 1);
+
+  elements.yearBars.innerHTML = `
+    <div class="bar-row">
+      ${sortedYears
+        .map(
+          (year) => `
+            <div class="bar">
+              <div class="bar-rect" style="height:${(yearCounts[year] / maxYearCount) * 100}%"></div>
+              <span>${year}</span>
+            </div>
+          `
+        )
+        .join("")}
+    </div>
+  `;
+
+  const totalParts = collection.reduce((sum, item) => sum + Number(item.parts), 0);
+  const averageParts = Math.round(totalParts / total);
+  const newestYear = Math.max(...collection.map((item) => item.year), new Date().getFullYear());
+  const oldestYear = Math.min(...collection.map((item) => item.year), 2000);
+  const completionPercent = Math.round((wishlist.length ? (wishlist.length - wishlist.length) / wishlist.length : 0) * 100);
+
+  elements.progressList.innerHTML = `
+    <div class="progress-block">
+      <label><span>總收藏套組</span><span>${total} 套</span></label>
+      <div class="progress-wrapper"><div class="progress-fill" style="width:${Math.min(100, total * 8)}%"></div></div>
+    </div>
+    <div class="progress-block">
+      <label><span>平均零件數</span><span>${averageParts}</span></label>
+      <div class="progress-wrapper"><div class="progress-fill" style="width:${Math.min(100, (averageParts / 1200) * 100)}%"></div></div>
+    </div>
+    <div class="progress-block">
+      <label><span>年份跨度</span><span>${oldestYear}–${newestYear}</span></label>
+      <div class="progress-wrapper"><div class="progress-fill" style="width:${Math.min(100, ((newestYear - oldestYear) / 10) * 100)}%"></div></div>
+    </div>
+  `;
+
+  const boughtCount = 0;
+  const wishlistRate = wishlist.length ? Math.round(((wishlist.length - boughtCount) / wishlist.length) * 100) : 0;
+  elements.wishlistCompletion.textContent = `完成率 ${100 - wishlistRate}%`;
+  elements.wishlistProgress.style.width = `${100 - wishlistRate}%`;
 }
 
 function resetForm() {
-  editingIndex = -1;
-  elements.manageForm.reset();
-  showMessage('欄位已清除。');
+  elements.itemForm.reset();
+  currentEditId = null;
+  elements.modalTitle.textContent = "新增樂高套組";
 }
 
-function fillFormForEdit(index) {
-  const item = vocabCards[index];
-  if (!item) return;
-  editingIndex = index;
-  elements.wordInput.value = item.word;
-  elements.translationInput.value = item.translation || '';
-  elements.posInput.value = item.partOfSpeech || '';
-  elements.exampleInput.value = item.example || '';
-  elements.rootInput.value = item.root || '';
-  showMessage(`正在編輯「${item.word}」。`);
-  switchTab(true);
+function openModal() {
+  elements.itemModal.classList.remove("hidden");
 }
 
-function applyWordListEvents() {
-  elements.wordListItems.addEventListener('click', (event) => {
-    const button = event.target.closest('button');
-    if (!button) return;
-    const action = button.dataset.action;
-    const index = Number(button.dataset.index);
-    if (action === 'edit') {
-      fillFormForEdit(index);
-    } else if (action === 'delete') {
-      vocabCards.splice(index, 1);
-      if (currentIndex >= vocabCards.length) {
-        currentIndex = Math.max(vocabCards.length - 1, 0);
-      }
-      saveCards();
-      renderWordList();
-      renderCard();
-      showMessage('已刪除單字。');
-    }
-  });
-}
-
-async function fetchDictionaryData(word) {
-  const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
-  if (!response.ok) {
-    throw new Error('無法取得字典資料');
-  }
-  return response.json();
-}
-
-async function fetchTranslation(word) {
-  const response = await fetch('https://libretranslate.com/translate', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ q: word, source: 'en', target: 'zh', format: 'text' }),
-  });
-
-  if (!response.ok) {
-    throw new Error('翻譯 API 錯誤');
-  }
-  const data = await response.json();
-  if (data && data.translatedText) {
-    return data.translatedText;
-  }
-  throw new Error('無法解析翻譯結果');
-}
-
-function extractRootInfo(entry) {
-  if (!entry) return '';
-  if (entry.origin) return entry.origin;
-  const word = entry.word || '';
-  const suffixes = ['ing', 'ed', 'ly', 'tion', 'sion', 'able', 'ible'];
-  const match = suffixes.find((suffix) => word.toLowerCase().endsWith(suffix));
-  if (match) {
-    return `此單字可能包含後綴 ${match}。`;
-  }
-  return '暫無字根分析資料。';
-}
-
-async function autoFillFields() {
-  const word = elements.wordInput.value.trim();
-  if (!word) {
-    showMessage('請先輸入英文單字。', true);
-    return;
-  }
-
-  showMessage('正在自動填入資料，請稍候...');
-  elements.autoFill.disabled = true;
-
-  try {
-    const dictionaryData = await fetchDictionaryData(word);
-    if (Array.isArray(dictionaryData) && dictionaryData.length > 0) {
-      const entry = dictionaryData[0];
-      const meaning = entry.meanings && entry.meanings[0];
-      const definition = meaning?.definitions?.[0];
-      elements.posInput.value = meaning?.partOfSpeech || '';
-      elements.exampleInput.value = definition?.example || '';
-      elements.rootInput.value = extractRootInfo(entry);
-    }
-
-    try {
-      const translation = await fetchTranslation(word);
-      elements.translationInput.value = translation;
-    } catch (translateError) {
-      console.warn('翻譯 API 失敗', translateError);
-      if (!elements.translationInput.value) {
-        elements.translationInput.value = '翻譯 API 無回應，請手動輸入。';
-      }
-    }
-
-    showMessage('自動填入完成，請檢查欄位內容。');
-  } catch (error) {
-    console.error(error);
-    showMessage('自動填入失敗，請確認英文單字或稍後再試。', true);
-  } finally {
-    elements.autoFill.disabled = false;
-  }
-}
-
-async function saveForm(event) {
-  event.preventDefault();
-  const word = elements.wordInput.value.trim();
-  if (!word) {
-    showMessage('英文單字為必填。', true);
-    return;
-  }
-
-  const item = {
-    word,
-    translation: elements.translationInput.value.trim(),
-    partOfSpeech: elements.posInput.value.trim(),
-    example: elements.exampleInput.value.trim(),
-    root: elements.rootInput.value.trim(),
-  };
-
-  if (editingIndex >= 0 && editingIndex < vocabCards.length) {
-    vocabCards[editingIndex] = item;
-    showMessage(`正在更新「${word}」，並同步到後端...`);
-  } else {
-    const exists = vocabCards.some((entry) => entry.word.toLowerCase() === word.toLowerCase());
-    if (exists) {
-      showMessage('單字已存在，請編輯現有單字或輸入新的單字。', true);
-      return;
-    }
-    vocabCards.push(item);
-    currentIndex = vocabCards.length - 1;
-    showMessage(`正在新增「${word}」，並同步到後端...`);
-  }
-
-  saveCards();
-  renderWordList();
-  renderCard();
-
-  try {
-    await postWordToBackend(item);
-    showMessage(`已儲存「${word}」並送到後端。`);
-  } catch (error) {
-    console.error(error);
-    showMessage(`已儲存單字，但後端同步失敗：${error.message}`, true);
-  }
-
+function closeModal() {
+  elements.itemModal.classList.add("hidden");
   resetForm();
 }
 
-function setupEvents() {
-  elements.tabStudy.addEventListener('click', () => switchTab(false));
-  elements.tabManage.addEventListener('click', () => switchTab(true));
-  elements.vocabCard.addEventListener('click', () => {
-    elements.vocabCard.classList.toggle('flipped');
-  });
-  elements.vocabCard.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      elements.vocabCard.classList.toggle('flipped');
+function openDetailModal(html) {
+  elements.detailBody.innerHTML = html;
+  elements.detailModal.classList.remove("hidden");
+}
+
+function closeDetailModal() {
+  elements.detailModal.classList.add("hidden");
+}
+
+function fillForm(item) {
+  elements.setName.value = item.name;
+  elements.setNumber.value = item.number;
+  elements.setTheme.value = item.theme;
+  elements.setYear.value = item.year;
+  elements.setParts.value = item.parts;
+  elements.setNotes.value = item.notes || "";
+  currentEditId = item.id;
+  elements.modalTitle.textContent = "編輯樂高套組";
+}
+
+function handleAction(event) {
+  const button = event.target.closest("button[data-action]");
+  if (!button) return;
+  const id = button.dataset.id;
+  const action = button.dataset.action;
+  const item = collection.find((entry) => entry.id === id);
+  if (!item && action !== "bought") return;
+
+  if (action === "view") {
+    const detailHtml = `
+      <img src="${item.image}" alt="${item.name}" />
+      <div class="detail-list">
+        <div class="detail-row"><span class="detail-label">名稱</span><span class="detail-value">${item.name}</span></div>
+        <div class="detail-row"><span class="detail-label">編號</span><span class="detail-value">${item.number}</span></div>
+        <div class="detail-row"><span class="detail-label">系列</span><span class="detail-value">${item.theme}</span></div>
+        <div class="detail-row"><span class="detail-label">上市年份</span><span class="detail-value">${item.year}</span></div>
+        <div class="detail-row"><span class="detail-label">零件數</span><span class="detail-value">${item.parts}</span></div>
+        <div class="detail-row"><span class="detail-label">備註</span><span class="detail-value">${item.notes || "無"}</span></div>
+      </div>
+    `;
+    openDetailModal(detailHtml);
+  }
+
+  if (action === "edit") {
+    fillForm(item);
+    openModal();
+  }
+
+  if (action === "delete") {
+    const confirmDelete = confirm("確定要移除這筆收藏嗎？");
+    if (!confirmDelete) return;
+    collection = collection.filter((entry) => entry.id !== id);
+    saveState();
+    renderAll();
+    showToast("已移除收藏套組。");
+  }
+
+  if (action === "bought") {
+    wishlist = wishlist.filter((entry) => entry.id !== id);
+    saveState();
+    renderAll();
+    showToast("已標記為已購買，已從願望清單移除。");
+  }
+}
+
+function handleFormSubmit(event) {
+  event.preventDefault();
+  const newData = {
+    id: currentEditId || crypto.randomUUID(),
+    name: elements.setName.value.trim(),
+    number: elements.setNumber.value.trim(),
+    theme: elements.setTheme.value,
+    year: Number(elements.setYear.value),
+    parts: Number(elements.setParts.value),
+    notes: elements.setNotes.value.trim(),
+    image: "",
+  };
+
+  if (elements.setImage.files.length) {
+    const file = elements.setImage.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      newData.image = reader.result;
+      commitSet(newData);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    const existing = collection.find((item) => item.id === currentEditId);
+    newData.image = existing ? existing.image : "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=900&q=80";
+    commitSet(newData);
+  }
+}
+
+function commitSet(data) {
+  if (currentEditId) {
+    collection = collection.map((item) => (item.id === data.id ? data : item));
+    showToast("收藏資料已更新。");
+  } else {
+    collection.unshift(data);
+    showToast("已新增收藏套組。立即生效。" );
+  }
+  saveState();
+  renderAll();
+  closeModal();
+}
+
+function renderAll() {
+  renderOverview();
+  renderCollection();
+  renderWishlist();
+  renderStats();
+}
+
+function toggleTheme() {
+  document.documentElement.classList.toggle("dark-mode");
+  const isDark = document.documentElement.classList.contains("dark-mode");
+  elements.modeToggle.textContent = isDark ? "淺色模式" : "深色模式";
+}
+
+function init() {
+  renderAll();
+  elements.searchInput.addEventListener("input", renderCollection);
+  elements.themeFilter.addEventListener("change", renderCollection);
+  elements.sortSelect.addEventListener("change", renderCollection);
+  elements.openAddModal.addEventListener("click", openModal);
+  elements.closeModal.addEventListener("click", closeModal);
+  elements.closeDetail.addEventListener("click", closeDetailModal);
+  elements.cancelBtn.addEventListener("click", closeModal);
+  elements.itemForm.addEventListener("submit", handleFormSubmit);
+  document.addEventListener("click", handleAction);
+  elements.modeToggle.addEventListener("click", toggleTheme);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeModal();
+      closeDetailModal();
     }
   });
-  elements.prevWord.addEventListener('click', () => updateStudyIndex(-1));
-  elements.nextWord.addEventListener('click', () => updateStudyIndex(1));
-  elements.autoFill.addEventListener('click', autoFillFields);
-  elements.manageForm.addEventListener('submit', saveForm);
-  elements.resetForm.addEventListener('click', resetForm);
-  applyWordListEvents();
 }
 
-function initialize() {
-  loadCards();
-  renderCard();
-  renderWordList();
-  setupEvents();
-}
-
-initialize();
+init();
