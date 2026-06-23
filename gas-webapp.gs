@@ -13,6 +13,12 @@ function getSpreadsheet() {
   throw new Error('無法開啟試算表。請在 gas-webapp.gs 中設定 SPREADSHEET_ID，或將 Apps Script 綁定到試算表。');
 }
 
+function doGet(e) {
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: 'ready' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 function doPost(e) {
   try {
     const requestBody = JSON.parse(e.postData.contents);
