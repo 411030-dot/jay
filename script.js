@@ -3,6 +3,27 @@ const gasEndpoint = 'https://script.google.com/macros/s/AKfycbxmxjUnivor-ZATbKtF
 const apiBase = 'https://api.openweathermap.org/data/2.5/weather';
 const geoApiBase = 'https://api.openweathermap.org/geo/1.0/direct';
 
+const TW_CITY_MAP = {
+  '台北': 'Taipei',
+  '台北市': 'Taipei',
+  '高雄': 'Kaohsiung',
+  '高雄市': 'Kaohsiung',
+  '台中': 'Taichung',
+  '台中市': 'Taichung',
+  '台南': 'Tainan',
+  '台南市': 'Tainan',
+  '桃園': 'Taoyuan',
+  '桃園市': 'Taoyuan',
+  '新竹': 'Hsinchu',
+  '新竹市': 'Hsinchu',
+  '基隆': 'Keelung',
+  '花蓮': 'Hualien',
+  '宜蘭': 'Yilan',
+  '屏東': 'Pingtung',
+  '嘉義': 'Chiayi',
+  '嘉義市': 'Chiayi',
+};
+
 const elements = {
   cityInput: document.getElementById('cityInput'),
   searchButton: document.getElementById('searchButton'),
@@ -43,7 +64,8 @@ function renderWeather(data, displayCity, displayCountry) {
 
 async function fetchWeather(city) {
   try {
-    const geoResponse = await fetch(`${geoApiBase}?q=${encodeURIComponent(city)}&limit=1&appid=${apiKey}`);
+    const normalizedCity = TW_CITY_MAP[city.trim()] || city.trim();
+    const geoResponse = await fetch(`${geoApiBase}?q=${encodeURIComponent(normalizedCity)}&limit=3&appid=${apiKey}`);
     if (!geoResponse.ok) {
       const errorData = await geoResponse.json();
       throw new Error(errorData.message || '城市查詢失敗，請稍後再試。');
@@ -54,7 +76,8 @@ async function fetchWeather(city) {
       throw new Error('找不到對應城市，請改用繁體/簡體中文或英文再試一次。');
     }
 
-    const location = geoData[0];
+    const taiwanLocation = geoData.find((item) => item.country === 'TW');
+    const location = taiwanLocation || geoData[0];
     const response = await fetch(`${apiBase}?lat=${location.lat}&lon=${location.lon}&appid=${apiKey}&units=metric&lang=zh_tw`);
     if (!response.ok) {
       const errorData = await response.json();
@@ -62,10 +85,13 @@ async function fetchWeather(city) {
     }
 
     const data = await response.json();
-    latestWeatherData = data;
-    // 使用地理編碼返回的城市名稱和國家代碼
-    const displayCity = location.name || data.name;
+    const displayCity = TW_CITY_MAP[city.trim()] || location.local_names?.en || location.name || data.name;
     const displayCountry = location.country || data.sys.country;
+    latestWeatherData = {
+      ...data,
+      displayCity,
+      displayCountry,
+    };
     localStorage.setItem('lastCity', city);
     renderWeather(data, displayCity, displayCountry);
     showMessage('');
@@ -88,8 +114,8 @@ function saveWeatherRecord() {
 
   const payload = {
     timestamp: new Date().toISOString(),
-    city: latestWeatherData.name,
-    country: latestWeatherData.sys.country,
+    city: latestWeatherData.displayCity || latestWeatherData.name,
+    country: latestWeatherData.displayCountry || latestWeatherData.sys.country,
     description: latestWeatherData.weather[0].description,
     temperature: latestWeatherData.main.temp,
     humidity: latestWeatherData.main.humidity,
