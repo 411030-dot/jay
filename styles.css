@@ -111,6 +111,37 @@ input {
   background: #1d4ed8;
 }
 
+.action-row,
+.save-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.secondary-button,
+.save-row button {
+  border: 1px solid rgba(37, 99, 235, 0.24);
+  border-radius: 18px;
+  background: #eef2ff;
+  color: #1d4ed8;
+  padding: 0.85rem 1.4rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.secondary-button:hover,
+.save-row button:hover {
+  transform: translateY(-1px);
+  background: #dbeafe;
+}
+
+.save-note {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
 .hint {
   margin: 0;
   color: #64748b;

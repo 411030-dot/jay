@@ -20,10 +20,15 @@
       <section class="search-panel">
         <label for="cityInput">城市名稱</label>
         <div class="search-box">
-          <input id="cityInput" type="text" placeholder="例如：Taipei, Tokyo, New York" />
+          <input id="cityInput" type="text" placeholder="例如：Taipei、台北、Tokyo、東京" />
           <button id="searchButton">查詢</button>
         </div>
-        <p class="hint">請輸入城市名稱後按「查詢」或按 Enter。</p>
+        <div class="action-row">
+          <button id="autoFillButton" class="secondary-button">自動填入測試城市</button>
+          <button id="clearButton" class="secondary-button">清除資料</button>
+        </div>
+        <p class="hint">請輸入英文或中文城市名稱後按「查詢」或按 Enter。若先前查詢過，頁面載入時會自動重新顯示。</p>
+        <p class="api-note">請先在 <code>script.js</code> 內填入 OpenWeather API Key 與 Google Apps Script Web App URL。</p>
       </section>
 
       <section class="weather-card hidden" id="weatherCard">
@@ -52,6 +57,11 @@
             <span>天氣代碼</span>
             <strong id="weatherCode"></strong>
           </div>
+        </div>
+
+        <div class="save-row">
+          <button id="saveButton">儲存到 Google 試算表</button>
+          <p class="save-note">已取得資料後，可按此將結果送到 Apps Script。</p>
         </div>
       </section>
 
