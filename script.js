@@ -1,5 +1,5 @@
-const apiKey = '596976b8bd6a47cda2d36ddaa5adf168'; // 請替換成自己的 OpenWeather API 金鑰
-const gasEndpoint = 'https://script.google.com/macros/s/AKfycbw1agJkNmsI-7lxfunmfCQjfv1Ine6cA4AbpyosreYBsUIjwtm6d9wMC6be7vCS8pMgaw/exec';
+const apiKey = '596976b8bd6a47cda2d36ddaa5adf168';
+const gasEndpoint = 'https://script.google.com/macros/s/AKfycbxmxjUnivor-ZATbKtFfH_YrJ-QwMBk9CXuCj3rVTJ-0x7rGYaW50RXh5th6oJ6g1DEGQ/exec';
 const apiBase = 'https://api.openweathermap.org/data/2.5/weather';
 const geoApiBase = 'https://api.openweathermap.org/geo/1.0/direct';
 
@@ -30,8 +30,8 @@ function showMessage(text) {
   elements.message.textContent = text;
 }
 
-function renderWeather(data) {
-  elements.cityName.textContent = `${data.name}, ${data.sys.country}`;
+function renderWeather(data, displayCity, displayCountry) {
+  elements.cityName.textContent = `${displayCity || data.name}, ${displayCountry || data.sys.country}`;
   elements.weatherDescription.textContent = data.weather[0].description.replace(/\b\w/g, (c) => c.toUpperCase());
   elements.temperature.textContent = formatTemperature(data.main.temp);
   elements.humidity.textContent = `${data.main.humidity}%`;
@@ -63,8 +63,11 @@ async function fetchWeather(city) {
 
     const data = await response.json();
     latestWeatherData = data;
+    // 使用地理編碼返回的城市名稱和國家代碼
+    const displayCity = location.name || data.name;
+    const displayCountry = location.country || data.sys.country;
     localStorage.setItem('lastCity', city);
-    renderWeather(data);
+    renderWeather(data, displayCity, displayCountry);
     showMessage('');
   } catch (error) {
     elements.weatherCard.classList.add('hidden');
