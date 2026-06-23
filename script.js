@@ -1,5 +1,5 @@
 const apiKey = '596976b8bd6a47cda2d36ddaa5adf168';
-const gasEndpoint = 'https://script.google.com/macros/s/AKfycbzVyZE3lbsb0t_H8QbZ2HUXeg7sXluF_bY1x4sLGp0mYs2HRphgywwF8_eAoVUTslEgig/exec';
+const gasEndpoint = 'https://script.google.com/macros/s/AKfycby9XrRANau3w9EblEGOD-oUfunuAHJInwOFFUW83mk75JL0nVuP5Hnrj0KMfrzNlN9TJA/exec';
 const apiBase = 'https://api.openweathermap.org/data/2.5/weather';
 const geoApiBase = 'https://api.openweathermap.org/geo/1.0/direct';
 
